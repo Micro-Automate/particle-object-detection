@@ -1,4 +1,3 @@
-import time
 import numpy as np
 import scipy.stats as stats
 
@@ -74,6 +73,7 @@ class AdaptiveLearningRateScheduler(object):
         # Check learning rate
         if self.needs_update_lr(epoch, loss):
             self.reduce_lr(epoch)
+            self.buffer.clear()
             self.drop_count += 1
         if self.verbose:
             print("-" * 80)
