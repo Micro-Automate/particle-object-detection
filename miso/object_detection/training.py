@@ -61,18 +61,25 @@ def train(project: Project,
     print(f"- train: {len(dataset_train)}")
     print(f"- test:  {len(dataset_test)}")
 
+    sharing_strategy = "file_system"
+    torch.multiprocessing.set_sharing_strategy(sharing_strategy)
+    def set_worker_sharing_strategy(worker_id: int) -> None:
+        torch.multiprocessing.set_sharing_strategy(sharing_strategy)
+
     # Define training and validation data loaders
     data_loader_train = torch.utils.data.DataLoader(dataset_train,
                                                     batch_size=batch_size,
                                                     shuffle=True,
                                                     num_workers=4,
-                                                    collate_fn=utils.collate_fn)
+                                                    collate_fn=utils.collate_fn,
+                                                    worker_init_fn=set_worker_sharing_strategy)
 
     data_loader_test = torch.utils.data.DataLoader(dataset_test,
                                                    batch_size=1,
                                                    shuffle=False,
                                                    num_workers=4,
-                                                   collate_fn=utils.collate_fn)
+                                                   collate_fn=utils.collate_fn,
+                                                   worker_init_fn=set_worker_sharing_strategy)
 
     # Device to train on
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -80,7 +87,7 @@ def train(project: Project,
 
     # Get the model and move to correct device
     num_classes = len(labels) + 1
-    print(num_classes)
+    print(f"Number of classes: {num_classes}")
     model = get_object_detection_model(num_classes)
     model.to(device)
 
@@ -96,7 +103,7 @@ def train(project: Project,
                                lr=0.001)
     else:
         raise ValueError("Optimiser must be one of 'sgd' or 'adam'")
-
+    print(f"Optimiser: {optimiser}")
     # Learning rate scheduler
     lr_scheduler = AdaptiveLearningRateScheduler(opt,
                                                  factor=0.5,
@@ -108,6 +115,7 @@ def train(project: Project,
     #                                                gamma=0.5)
 
     # Train
+    print("=" * 80)
     for epoch in range(max_epochs):
         # Train for one epoch, printing every 10 iterations
         metrics = train_one_epoch(model, opt, data_loader_train, device, epoch, print_freq=10)
