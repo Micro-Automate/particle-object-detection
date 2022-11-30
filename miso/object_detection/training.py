@@ -63,6 +63,7 @@ def train(project: Project,
 
     sharing_strategy = "file_system"
     torch.multiprocessing.set_sharing_strategy(sharing_strategy)
+
     def set_worker_sharing_strategy(worker_id: int) -> None:
         torch.multiprocessing.set_sharing_strategy(sharing_strategy)
 
