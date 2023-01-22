@@ -117,7 +117,7 @@ mkdir ~/obj_det
 The following will start the image and set the directory where models will be stored to the `~/obj_det` directory. To save the models in another directory, replace `/home/$USER/obj_det` with that directory.
 
 ```shell
-docker run --rm --shm-size 8G --gpus all --net=cvat_cvat -v /home/$USER/obj_det:/obj_det --volumes-from cvat -it ghcr.io/microfossil/miso:latest /bin/bash
+docker run --rm --shm-size 16G --gpus all --net=cvat_cvat -v /home/$USER/obj_det:/obj_det --volumes-from cvat -it ghcr.io/microfossil/miso:latest /bin/bash
 ```
 
 A shell prompt should appear.
@@ -241,3 +241,31 @@ Parameters:
 * api: The CVAT api version, either "v1" or "v2" depending on which version CVAT is installed. To check, go to the CVAT site and enter "api/swagger" after the address, e.g.: `http://localhost:8080/api/swagger`. If it says "CVAT REST API 1.0" then use "v1", if it says "CVAT REST API 2.0" then use "v2".
 
 All objects will be cropped from the images and stored in `~/obj_det/crops/DATE_TIME_TASK_NUMBERS/TASK_NUMBER - TASK_NAME/LABEL/ORIGINAL_IMAGE_NAME_X_Y_WIDTH_HEIGHT.EXTENSION`
+
+# Troubleshooting
+
+## Bad file descriptor
+
+```python
+Traceback (most recent call last):
+  File "/app/miniconda/lib/python3.9/multiprocessing/resource_sharer.py", line 145, in _serve
+    send(conn, destination_pid)
+  File "/app/miniconda/lib/python3.9/multiprocessing/resource_sharer.py", line 50, in send
+    reduction.send_handle(conn, new_fd, pid)
+  File "/app/miniconda/lib/python3.9/multiprocessing/reduction.py", line 184, in send_handle
+    sendfds(s, [handle])
+  File "/app/miniconda/lib/python3.9/multiprocessing/reduction.py", line 149, in sendfds
+    sock.sendmsg([msg], [(socket.SOL_SOCKET, socket.SCM_RIGHTS, fds)])
+OSError: [Errno 9] Bad file descriptor
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/app/miniconda/lib/python3.9/multiprocessing/resource_sharer.py", line 147, in _serve
+    close()
+  File "/app/miniconda/lib/python3.9/multiprocessing/resource_sharer.py", line 52, in close
+    os.close(new_fd)
+OSError: [Errno 9] Bad file descriptor
+```
+
+Increase the amount of memory

@@ -174,7 +174,7 @@ def infer_object_detector(tasks, input_dir, model, threshold, batch_size, nv, ws
               help='CVAT api version string, v1 or v2')
 def crop_objects(tasks, output_dir, wsl2, api):
     tasks = [int(task) for task in tasks.split(",")]
-    output_dir = os.path.join(output_dir, now_as_str() + "_" + "_".join([int(task) for task in tasks]))
+    output_dir = os.path.join(output_dir, now_as_str() + "_" + "_".join([str(task) for task in tasks]))
     for task in tasks:
         task = CvatTask("http://cvat:8080",
                         task,
