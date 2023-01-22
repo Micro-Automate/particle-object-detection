@@ -224,9 +224,9 @@ class CvatTask(object):
             print(f"- {len(self.frames)} images")
         frame_keys = []
         for idx, frame in enumerate(self.frames):
-            if os.path.exists(os.path.join(frame, self.image_root)):
+            if os.path.exists(os.path.join(self.image_root, frame)):
                 image = ImageMetadata(frame, self.image_root, self.task_id, idx)
-            elif os.path.exists(os.path.join(frame, "/home/django/share")):
+            elif os.path.exists(os.path.join("/home/django/share", frame)):
                 image = ImageMetadata(frame, "/home/django/share", self.task_id, idx)
             else:
                 print(f"Image {frame} could not be found.")
