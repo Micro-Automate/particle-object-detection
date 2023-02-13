@@ -328,11 +328,24 @@ class CvatTask(object):
                 self.image_root = f"/home/django/data/data/{self.data_location}/raw"
         else:
             self.image_root = os.path.join(self.image_root, str(self.data_location), "raw")
+        print(f"- Image root: {self.image_root}")
         if self.debug:
             print(f"- Name: {self.name}")
             print("- Labels:")
             for key, label in self.label_dict_by_name.items():
                 print(f"  - {label['name']}")
+
+    def _refresh_labels(self):
+        url = f"{self.server}/{self.api}/tasks/{self.task_id}"
+        if self.debug:
+            print(f"Fetching task metadata from {url}...")
+        data = requests.get(url, auth=HTTPBasicAuth('admin', 'admin')).json()
+        self.label_dict_by_name = {label["name"]: label for label in data['labels']}
+        self.label_dict_by_id = {label["id"]: label for label in data['labels']}
+        print(f"Refresh labels")
+        if self.debug:
+            for key, label in self.label_dict_by_name.items():
+                print(f"- {label['name']}")
 
     def _get_frames(self):
         url = f"{self.server}/{self.api}/tasks/{self.task_id}/data/meta"
@@ -357,15 +370,19 @@ class CvatTask(object):
 
     def add_missing_labels(self, project: Project):
         # Make sure we have the most up to date labels
-        self._get_metadata()
+        self._refresh_labels()
         # Check if there are new labels required
         cvat_labels = [label["name"] for key, label in self.label_dict_by_name.items()]
         new_labels = [label for label in project.label_dict.values() if label.name not in cvat_labels]
         # Add them to the project if there are
         if len(new_labels) > 0:
+            if self.debug:
+                print("Add new labels:")
+                for label in new_labels:
+                    print(f"- {label}")
             self.add_labels(new_labels)
         # Load the new labels
-        self._get_metadata()
+        self._refresh_labels()
 
     def add_labels(self, labels: List[Label]):
         url = f"{self.server}/{self.api}/projects/{self.project_id}"
@@ -391,7 +408,7 @@ class CvatTask(object):
         self.add_missing_labels(project)
         shapes = []
         # Make sure we have the most up-to-date labels
-        self._get_metadata()
+        # self._get_metadata()
         for key, image in project.image_dict.items():
             for box in image.boxes:
                 # print(list(box.coords))
