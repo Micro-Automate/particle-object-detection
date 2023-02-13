@@ -373,6 +373,7 @@ class CvatTask(object):
             print(f"Modifying labels...")
         cvat_labels = []
         for label in labels:
+            # if label.name not in self.label_dict_by_name.keys():
             label_dict = {"name": label.name}
             if label.colour is not None:
                 label_dict["color"] = label.colour
@@ -380,7 +381,6 @@ class CvatTask(object):
                 label_dict["id"] = label.id
             cvat_labels.append(label_dict)
         cvat_labels = {"labels": cvat_labels}
-        print(cvat_labels)
         response = requests.patch(url,
                                   data=json.dumps(cvat_labels),
                                   auth=HTTPBasicAuth('admin', 'admin'),
@@ -388,7 +388,7 @@ class CvatTask(object):
         print(f"Add labels result: {response.status_code}")
 
     def add_shapes(self, project: Project):
-        self.add_labels(list(project.label_dict.values()))
+        self.add_missing_labels(project)
         shapes = []
         # Make sure we have the most up-to-date labels
         self._get_metadata()
