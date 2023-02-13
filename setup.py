@@ -19,6 +19,7 @@ setup(
         'click',
         'scipy',
         'tqdm',
-        'scikit-image'
+        'scikit-image',
+        'imagecodecs'
     ]
 )
