@@ -214,10 +214,9 @@ def infer_object_detector_directory(input_dir, model_dir, model, threshold, batc
 
     project = infer_directory_fn(input_dir, model_path, labels, threshold, batch_size)
 
-    if crop:
-        crops_dir = Path(input_dir).joinpath("crops")
-        crops_dir.mkdir(parents=True, exist_ok=True)
-        crop_objects_fn(project, str(crops_dir))
+    crops_dir = Path(input_dir).joinpath("crops")
+    crops_dir.mkdir(parents=True, exist_ok=True)
+    crop_objects_fn(project, str(crops_dir))
 
 
 if __name__ == "__main__":
