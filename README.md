@@ -185,9 +185,10 @@ Parameters:
 
 * tasks: List of numbers of the tasks to train on
 * model: The name of the model to use for inference
-* threshold: Detection threshold (0 - 1). Choose a lower value to have more detections, but with more errors, or 
+* threshold: Detection threshold (0 - 1). Choose a lower value to have more detections, but with more errors, or larger value for less, more accurate detections
 * nv: This option will add "_NV" to the labels for detection. Omit if you do not want the labels to have "_NV" at the end.
 * api: The CVAT api version, either "v1" or "v2" depending on which version CVAT is installed. To check, go to the CVAT site and enter "api/swagger" after the address, e.g.: `http://localhost:8080/api/swagger`. If it says "CVAT REST API 1.0" then use "v1", if it says "CVAT REST API 2.0" then use "v2".
+* batch-size: Number of images in a batch (default 2)
 
 E.g. the above command uses the model called "Coccolith" to perform inference on tasks 15, 16 and 18
 
@@ -235,12 +236,36 @@ Configure the following command and run to start the cropping
 python -m miso.cli crop-objects --tasks "15,16,18" --api "v1"
 ```
 
+## Inference and crop of images
+
+This function is for inferring on images and not CVAT tasks
+
+### 1. Add images
+
+Add images to a directory inside the `obj_det` directory, e.g. `~/obj_det/images/dataset1`
+
+### 2. Choose the model
+
+Choose the model you with to use for inference. The models are in `~/obj_det/models`. The name of the model is the name of the directory.
+
+### 3. Run inference
+
+Configure the following command to launch training. 
+
+Note that the input directory is the internal directory in the docker container starting from `/obj_det`, e.g. `~/obj_det/images/dataset1` (which expands to `/home/USERNAME/obj_det/images/dataset1`) would be just `/obj_det/images/dataset1`.
+
+```shell
+python -m miso.cli infer-object-detector-directory --input-dir "/obj_det/images/dataset1" --model "Coccoliths" --threshold 0.5
+```
+
+Inference will be performed and the crops saved inside a `crops` directory in the images directory.
+
 Parameters:
 
-* tasks: List of numbers of the tasks to train on
-* api: The CVAT api version, either "v1" or "v2" depending on which version CVAT is installed. To check, go to the CVAT site and enter "api/swagger" after the address, e.g.: `http://localhost:8080/api/swagger`. If it says "CVAT REST API 1.0" then use "v1", if it says "CVAT REST API 2.0" then use "v2".
-
-All objects will be cropped from the images and stored in `~/obj_det/crops/DATE_TIME_TASK_NUMBERS/TASK_NUMBER - TASK_NAME/LABEL/ORIGINAL_IMAGE_NAME_X_Y_WIDTH_HEIGHT.EXTENSION`
+* input-dir: Directory of images
+* model: The name of the model to use for inference
+* threshold: Detection threshold (0 - 1). Choose a lower value to have more detections, but with more errors, or larger value for less, more accurate detections
+* batch-size: Number of images in a batch (default 2)
 
 # Troubleshooting
 

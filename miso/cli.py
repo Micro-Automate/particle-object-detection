@@ -1,10 +1,12 @@
 import os.path
+from pathlib import Path
 
 import click
 
 from miso.object_detection.dataset.cvat.cvat_web_api import CvatTask
 from miso.object_detection.dataset.project import Project
 from miso.object_detection.inference import infer
+from miso.object_detection.inference import infer_directory as infer_directory_fn
 from miso.object_detection.training import train
 from miso.object_detection.crop import crop_objects as crop_objects_fn
 from miso.shared.utils import now_as_str
@@ -98,8 +100,7 @@ def train_object_detector(tasks: str,
 @click.option('--tasks', type=str,
               prompt='List of task ids to infer on',
               help='List of task ids to infer on')
-@click.option('-i',
-              '--input-dir',
+@click.option('--model-dir',
               type=str,
               default="/obj_det/models",
               show_default=True,
@@ -124,10 +125,10 @@ def train_object_detector(tasks: str,
               default="v1",
               show_default=True,
               help='CVAT api version string, v1 or v2')
-def infer_object_detector(tasks, input_dir, model, threshold, batch_size, nv, wsl2, api):
+def infer_object_detector(tasks, model_dir, model, threshold, batch_size, nv, wsl2, api):
     tasks = [int(task) for task in tasks.split(",")]
-    model_path = os.path.join(input_dir, model, "model.pt")
-    labels_path = os.path.join(input_dir, model, "labels.txt")
+    model_path = os.path.join(model_dir, model, "model.pt")
+    labels_path = os.path.join(model_dir, model, "labels.txt")
 
     labels = []
     with open(labels_path) as fp:
@@ -183,6 +184,40 @@ def crop_objects(tasks, output_dir, wsl2, api):
                         debug=True)
         task.load()
         crop_objects_fn(task.project, output_dir)
+
+
+@cli.command()
+@click.option('-i', '--input-dir', type=str,
+              prompt='Name of folder containing images to infer on',
+              help='Name of folder containing images to infer on')
+@click.option('--model-dir',
+              type=str,
+              default="/obj_det/models",
+              show_default=True,
+              help='Directory containing models')
+@click.option('--model', type=str,
+              prompt='Name of folder containing model',
+              help='Name of folder containing model')
+@click.option('--threshold', type=float, default=0.5,
+              help='Detection threshold')
+@click.option('--batch-size', type=int, default=2,
+              help='Batch size for training (reduce if getting out-of-memory errors')
+def infer_object_detector_directory(input_dir, model_dir, model, threshold, batch_size):
+    model_path = os.path.join(model_dir, model, "model.pt")
+    labels_path = os.path.join(model_dir, model, "labels.txt")
+    labels = []
+    with open(labels_path) as fp:
+        for line in fp.readlines():
+            parts = line.split(",")
+            if len(parts) > 0:
+                labels.append(parts[1].strip())
+
+    project = infer_directory_fn(input_dir, model_path, labels, threshold, batch_size)
+
+    if crop:
+        crops_dir = Path(input_dir).joinpath("crops")
+        crops_dir.mkdir(parents=True, exist_ok=True)
+        crop_objects_fn(project, str(crops_dir))
 
 
 if __name__ == "__main__":

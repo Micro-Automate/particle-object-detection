@@ -14,7 +14,10 @@ def crop_objects(project: Project, output_dir: str):
             continue
         im = skio.imread(image.full_path)
         for box in image.boxes:
-            label_dir = os.path.join(output_dir, f"{image.dataset_id} - {project.task_names[image.dataset_id]}", box.label)
+            if len(project.task_names) > 0:
+                label_dir = os.path.join(output_dir, f"{image.dataset_id} - {project.task_names[image.dataset_id]}", box.label)
+            else:
+                label_dir = os.path.join(output_dir, box.label)
             os.makedirs(label_dir, exist_ok=True)
             c = box.coords_int
             s = box.bounds

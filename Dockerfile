@@ -17,6 +17,7 @@ RUN pip install -e .
 
 WORKDIR /obj_det
 
+RUN bash -ic 'history -s python -m miso.cli infer-object-detector-directory --input-dir \"/obj_det/images/dataset1\" --model \"Coccoliths\" --threshold 0.5'
 RUN bash -ic 'history -s python -m miso.cli crop-objects --tasks \"1,2\" --api \"v1\"'
 RUN bash -ic 'history -s python -m miso.cli infer-object-detector --tasks \"1,2\" --model Coccoliths --threshold 0.5 --nv --api \"v1\"'
 RUN bash -ic 'history -s python -m miso.cli train-object-detector --tasks \"1,2\" --labels \"Coccolith,Coccosphere\" --model \"Coccoliths\" --batch-size 8 --api \"v1\"'
