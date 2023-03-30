@@ -64,6 +64,13 @@ class Project(object):
     def update_label_dict(self):
         self.label_dict = self.labels_in_use()
 
+    def rename_label(self, old_label, new_label):
+        for image in self.image_dict.values():
+            for ann in image.boxes:
+                if ann.label == old_label:
+                    ann.label = new_label
+        # Remember to update label dict!
+
     """
     Images
     """

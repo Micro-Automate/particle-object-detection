@@ -28,6 +28,10 @@ def cli():
               type=str,
               default=None,
               help='List of label names to train on separated by commas')
+@click.option('--merge-label',
+              type=str,
+              default=None,
+              help='Merge the labels into a single label')
 @click.option('--batch-size',
               type=int,
               default=2,
@@ -66,6 +70,7 @@ def cli():
               help='Maximum number of epochs')
 def train_object_detector(tasks: str,
                           labels: str,
+                          merge_label: str,
                           batch_size: int,
                           wsl2: bool,
                           api: str,
@@ -73,10 +78,12 @@ def train_object_detector(tasks: str,
                           model: str,
                           data: str,
                           max_epochs):
+    # Tasks and labels
     tasks = [int(task.strip()) for task in tasks.split(",")]
     if labels is not None:
         labels = [label.strip() for label in labels.split(",")]
 
+    # Create project from tasks
     project = Project()
     for task in tasks:
         task = CvatTask("http://cvat:8080",
@@ -87,6 +94,13 @@ def train_object_detector(tasks: str,
         task.load()
         project.add_project(task.project)
 
+    # Merge labels if desired
+    if merge_label is not None:
+        for label in project.label_dict.values():
+            project.rename_label(label.name, merge_label)
+        project.update_label_dict()
+
+    # Train model
     # TODO train test split
     train(project,
           labels,

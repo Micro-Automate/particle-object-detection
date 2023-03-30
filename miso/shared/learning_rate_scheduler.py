@@ -34,7 +34,7 @@ class RollingBuffer:
         return self.__counter == self.__buffer_len
 
     def slope_probability_less_than(self, prob):
-        idxs = self.indices()
+        idxs = np.asarray(self.indices())
         n = len(idxs)
         if n < 3:
             return 1
