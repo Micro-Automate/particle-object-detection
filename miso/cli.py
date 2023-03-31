@@ -97,7 +97,8 @@ def train_object_detector(tasks: str,
     # Merge labels if desired
     if merge_label is not None:
         for label in project.label_dict.values():
-            project.rename_label(label.name, merge_label)
+            if label.name in labels:
+                project.rename_label(label.name, merge_label)
         project.update_label_dict()
         labels = [merge_label]
 
