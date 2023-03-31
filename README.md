@@ -236,6 +236,13 @@ Configure the following command and run to start the cropping
 python -m miso.cli crop-objects --tasks "15,16,18" --api "v1"
 ```
 
+Parameters:
+
+* tasks: List of numbers of the tasks to train on
+* api: The CVAT api version, either "v1" or "v2" depending on which version CVAT is installed. To check, go to the CVAT site and enter "api/swagger" after the address, e.g.: `http://localhost:8080/api/swagger`. If it says "CVAT REST API 1.0" then use "v1", if it says "CVAT REST API 2.0" then use "v2".
+
+All objects will be cropped from the images and stored in `~/obj_det/crops/DATE_TIME_TASK_NUMBERS/TASK_NUMBER - TASK_NAME/LABEL/ORIGINAL_IMAGE_NAME_X_Y_WIDTH_HEIGHT.EXTENSION`
+
 ## Inference and crop of images
 
 This function is for inferring on images and not CVAT tasks

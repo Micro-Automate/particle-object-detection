@@ -99,6 +99,7 @@ def train_object_detector(tasks: str,
         for label in project.label_dict.values():
             project.rename_label(label.name, merge_label)
         project.update_label_dict()
+        labels = [merge_label]
 
     # Train model
     # TODO train test split

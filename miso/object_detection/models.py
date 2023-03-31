@@ -1,6 +1,6 @@
 import torch
 from torchvision.models.detection import maskrcnn_resnet50_fpn, MaskRCNN_ResNet50_FPN_Weights
-from torchvision.models.detection.faster_rcnn import FastRCNNPredictor, fasterrcnn_resnet50_fpn, FasterRCNN_ResNet50_FPN_Weights, M
+from torchvision.models.detection.faster_rcnn import FastRCNNPredictor, fasterrcnn_resnet50_fpn, FasterRCNN_ResNet50_FPN_Weights
 from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
 
 
