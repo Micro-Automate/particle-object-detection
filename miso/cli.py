@@ -68,6 +68,16 @@ def cli():
               default="100000",
               show_default=True,
               help='Maximum number of epochs')
+@click.option('--alrs-epochs',
+              type=int,
+              default="10",
+              show_default=True,
+              help='Number of epochs to monitor for alrs')
+@click.option('--optimiser',
+              type=str,
+              default="sgd",
+              show_default=True,
+              help='Optimiser to use')
 def train_object_detector(tasks: str,
                           labels: str,
                           merge_label: str,
@@ -77,7 +87,9 @@ def train_object_detector(tasks: str,
                           output_dir: str,
                           model: str,
                           data: str,
-                          max_epochs):
+                          max_epochs,
+                          alrs_epochs,
+                          optimiser):
     # Tasks and labels
     tasks = [int(task.strip()) for task in tasks.split(",")]
     if labels is not None:
@@ -109,7 +121,9 @@ def train_object_detector(tasks: str,
           output_dir=output_dir,
           name=model,
           batch_size=batch_size,
-          max_epochs=max_epochs)
+          max_epochs=max_epochs,
+          alrs_epochs=alrs_epochs,
+          optimiser=optimiser)
 
 
 @cli.command()
