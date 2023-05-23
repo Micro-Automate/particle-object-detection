@@ -75,17 +75,17 @@ def infer_directory(input_dir: str,
     p = Path(input_dir)
     if not p.exists():
         raise ValueError(f"Directory does not exist: {input_dir}")
-    paths = p.glob("*.*")
-    filenames = []
+    paths = p.rglob("*.*")
+    filepaths = []
     for path in paths:
         suffix = path.suffix.lower()
         if suffix == ".jpg" or suffix == ".jpeg" or suffix == ".png" or suffix == ".bmp" or suffix == ".tiff" or suffix == ".tif":
-            filenames.append(str(path))
+            filepaths.append(path)
 
     # Create project
     project = Project()
-    for i, filename in enumerate(filenames):
-        project.add_image(ImageMetadata(filename, "/", 0, i))
+    for i, filepath in enumerate(filepaths):
+        project.add_image(ImageMetadata(filepath, "/", 0, i))
 
     # Ensure labels
     for label in model_labels:

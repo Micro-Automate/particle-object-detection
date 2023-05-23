@@ -220,6 +220,9 @@ def crop_objects(tasks, output_dir, wsl2, api):
 @click.option('-i', '--input-dir', type=str,
               prompt='Name of folder containing images to infer on',
               help='Name of folder containing images to infer on')
+@click.option('-o', '--output-dir', type=str,
+              prompt='Name of folder to store results',
+              help='Name of folder to store results')
 @click.option('--model-dir',
               type=str,
               default="/obj_det/models",
@@ -232,7 +235,7 @@ def crop_objects(tasks, output_dir, wsl2, api):
               help='Detection threshold')
 @click.option('--batch-size', type=int, default=2,
               help='Batch size for training (reduce if getting out-of-memory errors')
-def infer_object_detector_directory(input_dir, model_dir, model, threshold, batch_size):
+def infer_object_detector_directory(input_dir, output_dir, model_dir, model, threshold, batch_size):
     model_path = os.path.join(model_dir, model, "model.pt")
     labels_path = os.path.join(model_dir, model, "labels.txt")
     labels = []
@@ -244,9 +247,10 @@ def infer_object_detector_directory(input_dir, model_dir, model, threshold, batc
 
     project = infer_directory_fn(input_dir, model_path, labels, threshold, batch_size)
 
-    crops_dir = Path(input_dir).joinpath("crops")
-    crops_dir.mkdir(parents=True, exist_ok=True)
-    crop_objects_fn(project, str(crops_dir))
+    # crops_dir = Path(input_dir).joinpath("crops")
+    # crops_dir.mkdir(parents=True, exist_ok=True)
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    crop_objects_fn(project, output_dir, relative_to=input_dir)
 
 
 if __name__ == "__main__":

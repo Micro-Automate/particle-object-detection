@@ -262,14 +262,15 @@ Configure the following command to launch training.
 Note that the input directory is the internal directory in the docker container starting from `/obj_det`, e.g. `~/obj_det/images/dataset1` (which expands to `/home/USERNAME/obj_det/images/dataset1`) would be just `/obj_det/images/dataset1`.
 
 ```shell
-python -m miso.cli infer-object-detector-directory --input-dir "/obj_det/images/dataset1" --model "Coccoliths" --threshold 0.5
+python -m miso.cli infer-object-detector-directory --input-dir "/obj_det/images/dataset1" --output-dir "/obj_det/images/dataset1_crops" --model "Coccoliths" --threshold 0.5
 ```
 
-Inference will be performed and the crops saved inside a `crops` directory in the images directory.
+Inference will be performed and the crops saved inside the output directory with the same relative path structure but in folders by label name
 
 Parameters:
 
 * input-dir: Directory of images
+* output-dir: Directory to store crops
 * model: The name of the model to use for inference
 * threshold: Detection threshold (0 - 1). Choose a lower value to have more detections, but with more errors, or larger value for less, more accurate detections
 * batch-size: Number of images in a batch (default 2)
