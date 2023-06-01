@@ -117,7 +117,7 @@ mkdir ~/obj_det
 The following will start the image and set the directory where models will be stored to the `~/obj_det` directory. To save the models in another directory, replace `/home/$USER/obj_det` with that directory.
 
 ```shell
-docker run --rm --shm-size 16G --gpus all --net=cvat_cvat -v /home/$USER/obj_det:/obj_det --volumes-from cvat -it ghcr.io/microfossil/miso:latest /bin/bash
+docker run --rm --shm-size 16G --gpus all --net=cvat_cvat --user $(id -u):$(id -g) -v /home/$USER/obj_det:/obj_det --volumes-from cvat -it ghcr.io/microfossil/miso:latest /bin/bash
 ```
 
 A shell prompt should appear.
