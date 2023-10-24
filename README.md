@@ -141,7 +141,8 @@ python -m miso.cli train-object-detector --tasks "15,16,18" --labels "Coccolith,
 Parameters:
 
 * tasks: List of numbers of the tasks to train on
-* labels: List of labels to train on. _Omit labels if you want to train on all labels with an annotation_
+* labels: List of labels to train on. _Omit labels if you want to train on all labels with an annotation_.
+* merge_label: Optional parameter. This will merge all the labels into a single label, e.g. `--merge-label microfossil`
 * model: The name of the output model. If the same name is used, the model will be overwritten. If omitted, the current date and time will be used
 * batch-size: Number of images in a batch.
 * api: The CVAT api version, either "v1" or "v2" depending on which version CVAT is installed. To check, go to the CVAT site and enter "api/swagger" after the address, e.g.: `http://localhost:8080/api/swagger`. If it says "CVAT REST API 1.0" then use "v1", if it says "CVAT REST API 2.0" then use "v2".
