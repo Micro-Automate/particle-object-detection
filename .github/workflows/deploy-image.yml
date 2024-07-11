@@ -11,11 +11,11 @@ name: Create and publish a Docker image
 
 on:
   push:
-    branches: ['main']
+    branches: ['cvat-2.7']
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: microfossil/miso
+  IMAGE_NAME: microfossil/particle-obj-det_cvat-2.7
 
 jobs:
   build-and-push-image:
