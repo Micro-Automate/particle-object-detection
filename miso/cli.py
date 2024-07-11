@@ -1,4 +1,4 @@
-import os.path
+import os
 from pathlib import Path
 
 import click
@@ -11,6 +11,10 @@ from miso.object_detection.training import train
 from miso.object_detection.crop import crop_objects as crop_objects_fn
 from miso.shared.utils import now_as_str
 
+# env variable HOST_HOSTNAME must be extracted when container 
+# is launched using "docker run" with "-e HOST_HOSTNAME=$(hostname -f)""
+hostname = os.getenv('HOST_HOSTNAME')
+port = '8080'
 
 @click.group()
 def cli():
@@ -78,6 +82,16 @@ def cli():
               default="sgd",
               show_default=True,
               help='Optimiser to use')
+@click.option('--hostname',
+              type=str,
+              default=hostname,
+              show_default=True,
+              help='Host hostname')
+@click.option('--port',
+              type=str,
+              default=port,
+              show_default=True,
+              help='port number')
 def train_object_detector(tasks: str,
                           labels: str,
                           merge_label: str,
@@ -89,7 +103,9 @@ def train_object_detector(tasks: str,
                           data: str,
                           max_epochs,
                           alrs_epochs,
-                          optimiser):
+                          optimiser,
+                          hostname,
+                          port):
     # Tasks and labels
     tasks = [int(task.strip()) for task in tasks.split(",")]
     if labels is not None:
@@ -98,7 +114,7 @@ def train_object_detector(tasks: str,
     # Create project from tasks
     project = Project()
     for task in tasks:
-        task = CvatTask("http://cvat:8080",
+        task = CvatTask(f"http://{hostname}:{port}",
                         task,
                         is_wsl2=wsl2,
                         api=api,
@@ -155,7 +171,17 @@ def train_object_detector(tasks: str,
               default="v1",
               show_default=True,
               help='CVAT api version string, v1 or v2')
-def infer_object_detector(tasks, model_dir, model, threshold, batch_size, nv, wsl2, api):
+@click.option('--hostname',
+              type=str,
+              default=hostname,
+              show_default=True,
+              help='Host hostname')
+@click.option('--port',
+              type=str,
+              default=port,
+              show_default=True,
+              help='port number')
+def infer_object_detector(tasks, model_dir, model, threshold, batch_size, nv, wsl2, api, hostname, port):
     tasks = [int(task) for task in tasks.split(",")]
     model_path = os.path.join(model_dir, model, "model.pt")
     labels_path = os.path.join(model_dir, model, "labels.txt")
@@ -168,7 +194,7 @@ def infer_object_detector(tasks, model_dir, model, threshold, batch_size, nv, ws
                 labels.append(parts[1].strip())
 
     for task in tasks:
-        task = CvatTask("http://cvat:8080",
+        task = CvatTask(f"http://{hostname}:{port}",
                         task,
                         is_wsl2=wsl2,
                         api=api,
