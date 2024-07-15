@@ -9,13 +9,12 @@
 
 name: Create and publish a Docker image
 
-on:
-  push:
-    branches: ['main']
+on: push
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: microfossil/miso
+  REGISTRY_OSU: registry.osupytheas.fr:443
+  IMAGE_NAME: microfossil/particle-obj-det
 
 jobs:
   build-and-push-image:
@@ -39,14 +38,19 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+            ${{ env.REGISTRY_OSU }}/${{ env.IMAGE_NAME }}
           tags: |
-            # branch event
-            type=ref,event=branch
             # tag event
             type=ref,event=tag
-            # set latest tag for default branch
+            # tag latest for default branch
             type=raw,value=latest,enable={{is_default_branch}}
+            # branch event (tag branch for non-default branches)
+            type=ref,event=branch
+            # tag with commit hash regardless of the branch
+            type=sha,format=short
+
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
