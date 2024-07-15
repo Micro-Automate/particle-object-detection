@@ -46,8 +46,8 @@ jobs:
             type=ref,event=tag
             # tag latest for default branch
             type=raw,value=latest,enable={{is_default_branch}}
-            # tag branch for non-default branches
-            type=raw,value={{branch}},enable={{!is_default_branch}}
+            # branch event (tag branch for non-default branches)
+            type=ref,event=branch
             # tag with commit hash regardless of the branch
             type=sha,format=short
 
