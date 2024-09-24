@@ -26,11 +26,21 @@ https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.
 
 ### 4. Create / pull docker image
 
-Pull the docker image from the docker container repository, this will take a while the first time:
+Pull the docker image from the docker container repository, this will take a while the first time. You should choose the image depending on the CVAT version you are using:
 
-```shell
-docker pull ghcr.io/microfossil/miso:latest
-```
+- Compatible with **CVAT** `v1.7`:
+  ```shell
+  docker pull ghcr.io/microfossil/miso:latest
+  ```
+
+- Compatible with **CVAT** `v2.7`. This image is available from 2 sources:
+  ```shell
+  docker pull ghcr.io/microfossil/particle-obj-det:cvat-2.7
+  ```
+  Or (available only for Rapp users):
+  ```shell
+  docker pull registry.osupytheas.fr:443/microfossil/particle-obj-det:cvat-2.7
+  ```
 
 Alternatively, you can build it from source
 
@@ -38,6 +48,10 @@ Alternatively, you can build it from source
 git clone https://github.com/microfossil/particle-object-detection.git
 cd particle-object-detection
 docker build -t ghcr.io/microfossil/miso:latest . 
+# Or
+docker build -t ghcr.io/microfossil/particle-obj-det:cvat-2.7
+# Or
+docker build -t registry.osupytheas.fr:443/microfossil/particle-obj-det:cvat-2.7
 ```
 
 ## Add yourself to the list of docker users
@@ -64,7 +78,7 @@ Logout from the server / local machine and log back in again
 
 ## Training set
 
-**RAPP USERS: CVAT can be accessed from https://rapp.osupytheas.fr:8080**
+**RAPP USERS: CVAT can be accessed from https://rapp.osupytheas.fr:8080** or **https://rapp.cerege.fr:8080**.
 
 Object detector models learn to place a bounding box (rectangle) around objects in an image. 
 
@@ -94,15 +108,23 @@ You also want to ensure that enough examples of each class are present in the tr
 
 ## Training
 
-**RAPP USERS: Open a terminal and connect to the RAPP server with `ssh -X USERNAME@rapp.osupytheas.fr`. User the terminal to perform these commands.**
+**RAPP USERS: Open a terminal and connect to the RAPP server with `ssh -X USERNAME@rapp.osupytheas.fr` or `ssh -X USERNAME@rapp.cerege.fr`.**
 
 ### 1. Update
 
 Make sure you have the latest version of the docker image
 
-```shell
-docker pull ghcr.io/microfossil/miso:latest
-```
+- Compatible with **CVAT** `v1.7`:
+  ```shell
+  docker pull ghcr.io/microfossil/miso:latest
+  ```
+
+- Compatible with **CVAT** `v2.7`:
+  ```shell
+  docker pull ghcr.io/microfossil/particle-obj-det:cvat-2.7
+  # Or
+  docker pull registry.osupytheas.fr:443/microfossil/particle-obj-det:cvat-2.7
+  ```
 
 ### 2. Create a directory to store models
 
@@ -119,6 +141,16 @@ The following will start the image and set the directory where models will be st
 ```shell
 docker run --rm --shm-size 16G --gpus all --net=cvat_cvat --user $(id -u):$(id -g) -v /home/$USER/obj_det:/obj_det --volumes-from cvat -it ghcr.io/microfossil/miso:latest /bin/bash
 ```
+
+Or for **Rapp** users:
+- If you connected to `rapp.osupytheas.fr`:
+  ```shell
+  docker run --rm --shm-size 16G --gpus all -e HOST_HOSTNAME=$(hostname -f) --net=cvat_cvat -v /home/$USER/obj_det:/obj_det --volumes-from cvat_server -it registry.osupytheas.fr:443/microfossil/particle-obj-det:cvat-2.7 /bin/bash
+  ```
+- If you connected to `rapp.cerege.fr`:
+  ```shell
+  docker run --rm --shm-size 16G --gpus all -e HOST_HOSTNAME=$(hostname -f) --net=cvat-cerege-fr_cvat -v /home/$USER/obj_det:/obj_det --volumes-from cvat_server -it registry.osupytheas.fr:443/microfossil/particle-obj-det:cvat-2.7 /bin/bash
+  ```
 
 A shell prompt should appear.
 
@@ -137,6 +169,8 @@ Configure the following command to launch training.
 ```shell
 python -m miso.cli train-object-detector --tasks "15,16,18" --labels "Coccolith,Coccosphere" --model "Coccoliths" --batch-size 4 --api "v1" --max-epochs 1000 
 ```
+
+For **Rapp** users, use `--api "v2"` instead.
 
 Parameters:
 
@@ -181,6 +215,8 @@ Configure the following command to launch training.
 ```shell
 python -m miso.cli infer-object-detector --tasks "15,16,18" --model "Coccoliths" --threshold 0.5 --nv --api "v1" 
 ```
+
+For **Rapp** users, use `--api "v2"` instead.
 
 Parameters:
 
@@ -236,6 +272,8 @@ Configure the following command and run to start the cropping
 ```shell
 python -m miso.cli crop-objects --tasks "15,16,18" --api "v1"
 ```
+
+For **Rapp** users, use `--api "v2"` instead.
 
 Parameters:
 
