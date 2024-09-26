@@ -356,8 +356,24 @@ class CvatTask(object):
         if self.debug:
             print(f"Fetching task metadata from {url}...")
         data = requests.get(url, auth=HTTPBasicAuth('admin', 'admin')).json()
-        self.label_dict_by_name = {label["name"]: label for label in data['labels']}
-        self.label_dict_by_id = {label["id"]: label for label in data['labels']}
+
+        # Change for CVAT 2.7.4
+        #-----------------------------------------------------------------------------------#
+        # self.label_dict_by_name = {label["name"]: label for label in data['labels']}
+        # self.label_dict_by_id = {label["id"]: label for label in data['labels']}
+        #-----------------------------------------------------------------------------------#
+        url_labels = data['labels']['url']
+        data_labels = requests.get(url_labels, auth=HTTPBasicAuth('admin', 'admin')).json()
+        list_labels = data_labels['results']
+        
+        while data_labels["next"]:
+            data_labels = requests.get(data_labels["next"], auth=HTTPBasicAuth('admin', 'admin')).json()
+            list_labels = list_labels + data_labels['results']
+    
+        self.label_dict_by_name = {label["name"]: label for label in list_labels}
+        self.label_dict_by_id = {label["id"]: label for label in list_labels}    
+        #-----------------------------------------------------------------------------------#
+
         print(f"Refresh labels")
         if self.debug:
             for key, label in self.label_dict_by_name.items():
