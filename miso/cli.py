@@ -20,7 +20,6 @@ port = '8080'
 def cli():
     pass
 
-task = CvatTask(f"
 @cli.command()
 @click.option('-t',
               '--tasks',
