@@ -20,7 +20,7 @@ port = '8080'
 def cli():
     pass
 
-
+task = CvatTask(f"
 @cli.command()
 @click.option('-t',
               '--tasks',
@@ -233,7 +233,7 @@ def crop_objects(tasks, output_dir, wsl2, api):
     tasks = [int(task) for task in tasks.split(",")]
     output_dir = os.path.join(output_dir, now_as_str() + "_" + "_".join([str(task) for task in tasks]))
     for task in tasks:
-        task = CvatTask("http://cvat:8080",
+        task = CvatTask(f"http://{hostname}:{port}",
                         task,
                         is_wsl2=wsl2,
                         api=api,
